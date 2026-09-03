@@ -30,6 +30,41 @@ and the provided `WordCount1.java`, `Mapper.py`, and `Reducer.py` as starting po
 Collaborators: TODO.
 
 ## Execution time comparison
+2 worker cluster:
+```
+gcloud compute ssh test-dataproc-m \
+  --project=lab2-urlcount-3411 \
+  --zone=us-east4-a \
+  --command='cd /home/epontarelli/lab2-url-lister && make filesystem && make prepare'
+
+gcloud compute ssh test-dataproc-m \
+  --project=lab2-urlcount-3411 \
+  --zone=us-east4-a \
+  --command='cd /home/epontarelli/lab2-url-lister && make UrlCount.jar'
+
+gcloud compute ssh test-dataproc-m \
+  --project=lab2-urlcount-3411 \
+  --zone=us-east4-a \
+  --command='cd /home/epontarelli/lab2-url-lister && time -p make urlrun'
+```
+78.42s
+
+4 Worker cluster:
+```
+gcloud compute ssh test-dataproc-4w-m \
+  --project=lab2-urlcount-3411 \
+  --zone=us-east4-a \
+  --command='cd /home/epontarelli/lab2-url-lister && time -p make urlrun'
+
+gcloud compute ssh test-dataproc-4w-m \
+  --project=lab2-urlcount-3411 \
+  --zone=us-east4-a \
+  --command='cd /home/epontarelli/lab2-url-lister && time -p make urlstream'
+```
+74.85s
+
+Active project: lab2-urlcount-3411
+Cluster: test-dataproc in us-east4
 
 Both tests used `e2-standard-2` machines and the same two Wikipedia input files. The
 Java version took 78.42 seconds with 2 workers and 74.85 seconds with 4 workers, while
