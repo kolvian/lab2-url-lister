@@ -26,13 +26,22 @@ run: WordCount1.jar
 	-rm -rf output
 	hadoop jar WordCount1.jar WordCount1 input output
 
+UrlCount.jar: UrlCount.java
+	javac -classpath $(HADOOP_CLASSPATH) -d ./ UrlCount.java
+	jar cf UrlCount.jar UrlCount*.class
+	-rm -f UrlCount*.class
+
+urlrun: UrlCount.jar
+	-hdfs dfs -rm -r url-output
+	hadoop jar UrlCount.jar UrlCount input url-output
+
 
 ##
 ## You may need to change the path for this depending
 ## on your Hadoop / java setup
 ##
 HADOOP_V=3.3.6
-STREAM_JAR = /usr/local/hadoop-$(HADOOP_V)/share/hadoop/tools/lib/hadoop-streaming-$(HADOOP_V).jar
+STREAM_JAR ?= $(or $(firstword $(wildcard /usr/lib/hadoop/hadoop-streaming-*.jar)),/usr/local/hadoop-$(HADOOP_V)/share/hadoop/tools/lib/hadoop-streaming-$(HADOOP_V).jar)
 
 stream:
 	-rm -rf stream-output
@@ -41,3 +50,15 @@ stream:
 	-reducer Reducer.py \
 	-file Mapper.py -file Reducer.py \
 	-input input -output stream-output
+
+urlstream:
+	-hdfs dfs -rm -r url-stream-output
+	hadoop jar $(STREAM_JAR) \
+	-mapper UrlMapper.py \
+	-reducer UrlReducer.py \
+	-file UrlMapper.py -file UrlReducer.py \
+	-input input -output url-stream-output
+
+## Pipe the streaming pair by hand, skipping the MapReduce framework.
+urltest:
+	hdfs dfs -cat input/file01 input/file02 | python3 UrlMapper.py | sort | python3 UrlReducer.py
