@@ -47,7 +47,7 @@ gcloud compute ssh test-dataproc-m \
   --zone=us-east4-a \
   --command='cd /home/epontarelli/lab2-url-lister && time -p make urlrun'
 ```
-78.42s
+78.42s (java) 99.44s (python)
 
 4 Worker cluster:
 ```
@@ -61,7 +61,7 @@ gcloud compute ssh test-dataproc-4w-m \
   --zone=us-east4-a \
   --command='cd /home/epontarelli/lab2-url-lister && time -p make urlstream'
 ```
-74.85s
+74.85s (java) 100.51s (python)
 
 Active project: lab2-urlcount-3411
 Cluster: test-dataproc in us-east4
